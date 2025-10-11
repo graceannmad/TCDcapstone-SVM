@@ -64,7 +64,7 @@ if __name__ == "__main__":
     df = generate_blob_dataset(
         n_samples=300,
         n_features=2,
-        n_clusters=3,
+        n_clusters=2,
         cluster_std=0.8,
         to_csv="data/synthetic_blobs.csv"
     )
@@ -74,7 +74,7 @@ if __name__ == "__main__":
     df_anomalies = generate_blob_dataset_with_anomalies(
         n_samples=300,
         n_features=2,
-        n_clusters=3,
+        n_clusters=2,
         cluster_std=0.8,
         to_csv="data/synthetic_blobs_anomalies.csv"
     )
