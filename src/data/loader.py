@@ -1,46 +1,45 @@
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import StandardScaler
-from sklearn.decomposition import PCA
-from sklearn.model_selection import train_test_split
-import joblib
+import sys, os
+sys.path.append(os.path.abspath("..")) #need to do this to find src when launching from notebook
+from src.data.pca import library_pca
 
 def normalize(data, mean, std_dev):
-    # print("This is the data coming in to normalization:")
-    # print(data)
-    # print("I will now subtract this mean:")
-    # print(mean)
-    # print("Which results in:")
     data = data - mean
-    # print(data)
-    # print("now I will divide by the standard deviation which is:")
-    # print(std_dev)
-    # print("The reuslting data is")
     data = data / std_dev
-    # print(data)
     return data
+
 
 def preprocess(train, val, eval):
     ########### Standardization 
     train_mean = np.nanmean(train, axis=0) #need to exclude NaN values
     train_std_dev = np.nanstd(train, axis=0) #same here
-
     train = normalize(train, train_mean, train_std_dev)
 
     #now I will normalize the validation and evaluation sets with the mean and stdd from the test set
     val = normalize(val, train_mean, train_std_dev)
     eval = normalize(eval, train_mean, train_std_dev)
 
+    #before I can do PCA I need to get rid of NaN values, here is how I will do that
+    train = train[~np.isnan(train).any(axis=1)]
+    val = val[~np.isnan(val).any(axis=1)]
+    eval = eval[~np.isnan(eval).any(axis=1)]
+
     ########### PCA
-    #TODO
+    #and by that I mean, go get a PCA model that you can use to transform other data
+    pca_er = library_pca(train)
+    train = pca_er.transform(train)
+    val = pca_er.transform(val)
+    eval = pca_er.transform(eval)
+
     return train, val, eval
 
 
-
 def ibrl():
-    file_path = 'data/IBRLdata.txt' #NOTE: This may need to back out of the directory with ../ depending on where I run this python file from
+    file_path = '../data/IBRLdata.txt' #NOTE: This may need to back out of the directory with ../ depending on where I run this python file from
     #there are 2313682 lines in this file, each representing a set of readings 
     #BUT we only have full readings until line 2313153
+
     #I want to make a training dataset, a validation dataset, and an evaluation dataset
     #they will be 70% training, 15% validation, and 15% evaluation
     train_size = int(0.7 * 2313153)
@@ -60,15 +59,10 @@ def ibrl():
     X_val   = X[train_size:train_size+val_size]
     X_eval  = X[train_size+val_size:train_size+val_size+eval_size+1]
 
-    return X_train, X_val, X_eval
+    return preprocess(X_train, X_val, X_eval)
 
 
 if __name__ == "__main__":
-    #load the dataset from the Intel Berkeley Research Lab and standardize
+    #load the dataset from the Intel Berkeley Research Lab
+    #this also preprocesses the data! includes standardization and PCA
     train, val, eval = ibrl()
-    train, val, eval = preprocess(train, val, eval)
-
-    print(train)
-    print(val)
-    print(eval)
-
