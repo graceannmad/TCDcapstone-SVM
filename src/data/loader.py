@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 import sys, os
 sys.path.append(os.path.abspath("..")) #need to do this to find src when launching from notebook
 from src.data.pca import library_pca
@@ -19,6 +20,16 @@ def preprocess(train, val, eval):
     #now I will normalize the validation and evaluation sets with the mean and stdd from the test set
     val = normalize(val, train_mean, train_std_dev)
     eval = normalize(eval, train_mean, train_std_dev)
+
+    #lets count how many NaN values we have before we get rid of them
+    nan_train = np.sum(np.isnan(train))
+    nan_val = np.sum(np.isnan(val))
+    nan_eval = np.sum(np.isnan(eval))
+    print("Number of NaN values:")
+    print(f"Training:    {nan_train} out of {train.size}  -- that is {round((nan_train/train.size) * 100, 4)} percent.")
+    print(f"Validation:  {nan_val} out of {val.size}   -- that is {round((nan_val/val.size) * 100, 4)} percent.")
+    print(f"Evaluation:  {nan_eval} out of {val.size}  -- that is {round((nan_eval/val.size) * 100, 4)} percent.")
+    print(f"Overall:     {nan_eval + nan_train + nan_val} out of {val.size + train.size + eval.size}  -- that is {round(((nan_eval + nan_train + nan_val)/(val.size + train.size + eval.size)) * 100, 4)} percent.")
 
     #before I can do PCA I need to get rid of NaN values, here is how I will do that
     train = train[~np.isnan(train).any(axis=1)]
@@ -46,7 +57,6 @@ def ibrl():
     val_size = int(0.15 * 2313153)
     eval_size = int(0.15 * 2313153) #allows us to not include the end values that don't have readings
 
-
     #format:
     #date:yyyy-mm-dd	time:hh:mm:ss.xxx	epoch:int	moteid:int	temperature:real	humidity:real	light:real	voltage:real
     df = pd.read_csv(file_path, delimiter=" ", header=None)
@@ -59,10 +69,45 @@ def ibrl():
     X_val   = X[train_size:train_size+val_size]
     X_eval  = X[train_size+val_size:train_size+val_size+eval_size+1]
 
-    return preprocess(X_train, X_val, X_eval)
+    return X_train, X_val, X_eval
 
 
 if __name__ == "__main__":
     #load the dataset from the Intel Berkeley Research Lab
-    #this also preprocesses the data! includes standardization and PCA
     train, val, eval = ibrl()
+
+    #let's do some histogram-based labeling (ha)
+    #only look at first thousand vals
+
+    #show 10,000 then go to 60,000 to illustrate issue (!!!!1)
+    temperature = train[0:10000, 0] #first column
+    #np.arange to get epoch numbers starting from 1
+    epochs = np.arange(1, len(temperature) + 1)
+
+    #plot
+    plt.figure(figsize=(8, 5))
+    plt.plot(epochs, temperature, marker='o', linestyle='', color='b')
+    plt.title('Temperature over Epochs')
+    plt.xlabel('Epoch')
+    plt.ylabel('Temperature')
+    plt.grid(True)
+    plt.show()
+
+    #now humidity!!!
+    #show 10,000 then go to 60,000 to illustrate issue (!!!!1)
+    humidity = train[0:10000, 1] #first column
+    #np.arange to get epoch numbers starting from 1
+    epochs = np.arange(1, len(humidity) + 1)
+
+    #plot
+    plt.figure(figsize=(8, 5))
+    plt.plot(epochs, humidity, marker='o', linestyle='', color='b')
+    plt.title('Humidity over Epochs')
+    plt.xlabel('Epoch')
+    plt.ylabel('Humidity')
+    plt.grid(True)
+    plt.show()
+
+    #standardization and PCA
+    train, val, eval = preprocess(train, val, eval)
+    
