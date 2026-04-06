@@ -1,5 +1,6 @@
 # TCDcapstone-SVM
 
-source .venv/bin/activate
+This repository is a companion to Grace Madison's Bachelor Capstone project for Trinity College Dublin.
 
-deactivate
+### Abstract:
+Wireless sensor networks are commonly used to monitor environmental data and often benefit from on-line anomaly detection systems. Anomaly detection for WSNs can help avoid malfunction and allow for quick data interpretation. We will be looking at a specific framework for anomaly detection throughout this report: the Support Vector Machine (SVM). We develop the theory behind SVMs from the hard-margin classifier to the more standard soft-margin formulation. We including the construction of SVMs and how to specify them to anomaly detection tasks. We look at three variants of SVMs: the One-Class SVM (OC-SVM), the Ellipsoidal SVM (e-SVM), and the One-Class Centered Ellipsoidal SVM (OC-CESVM). Throughout the report, we build up to the OC-CESVM scheme in tandem with a variant of Principal Component Analysis (PCA) that is proposed by \cite{theMainPaper} as an effective and lightweight anomaly detection scheme for WSNs. 
