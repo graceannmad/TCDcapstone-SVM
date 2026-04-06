@@ -7,16 +7,15 @@ from sklearn.datasets import make_blobs
 def generate_blob_dataset(n_samples=200, n_features=2, n_clusters=2, cluster_std=1.0, random_state=42, to_csv=None):
     # Returns: X (pd.DataFrame): Feature matrix with cluster labels as y.
 
-    for i in range(n_clusters):
-        X, y = make_blobs(
-            n_samples=n_samples,
-            n_features=n_features,
-            centers=1,
-            cluster_std=cluster_std,
-            random_state=random_state,
-        )
-        df = pd.DataFrame(X, columns=[f"feature_{i+1}" for i in range(n_features)])
-        df["label"] = i
+    X, y = make_blobs(
+        n_samples=n_samples,
+        n_features=n_features,
+        centers=n_clusters,
+        cluster_std=cluster_std,
+        random_state=random_state,
+    )
+    df = pd.DataFrame(X, columns=[f"feature_{i+1}" for i in range(n_features)])
+    df["label"] = y
 
     if to_csv:
         df.to_csv(to_csv, index=False)
