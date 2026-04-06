@@ -37,7 +37,6 @@ def preprocess(train, val, eval):
     eval = eval[~np.isnan(eval).any(axis=1)]
 
     ########### PCA
-    #and by that I mean, go get a PCA model that you can use to transform other data
     pca_er = library_pca(train)
     train = pca_er.transform(train)
     val = pca_er.transform(val)
@@ -63,7 +62,7 @@ def ibrl():
     #only use sensor columns for PCA + SVM (real numbers)
     X = df.iloc[:, -4:].to_numpy()
 
-    #NOTE: I do not think I need the time data... because I am just classifying outliers in the usual values?
+    #NOTE: I do not need the time data... because I am classifying outliers in the usual values
 
     X_train = X[:train_size]
     X_val   = X[train_size:train_size+val_size]
